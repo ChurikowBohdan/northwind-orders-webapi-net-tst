@@ -1,5 +1,3 @@
-using Northwind.Services.Repositories;
-
 namespace Northwind.Services.EntityFramework.Entities;
 
 public class Customer

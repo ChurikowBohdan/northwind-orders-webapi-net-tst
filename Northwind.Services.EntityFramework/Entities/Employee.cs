@@ -2,7 +2,7 @@ namespace Northwind.Services.EntityFramework.Entities;
 
 public class Employee
 {
-    public long Id { get; private set; }
+    public int Id { get; private set; }
 
     public string FirstName { get; set; } = default!;
 

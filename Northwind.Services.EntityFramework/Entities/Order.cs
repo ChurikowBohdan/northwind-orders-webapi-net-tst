@@ -2,13 +2,13 @@ namespace Northwind.Services.EntityFramework.Entities;
 
 public class Order
 {
-    public long Id { get; private set; }
+    public int Id { get; private set; }
 
     public string CustomerId { get; set; } = default!;
 
     public int EmployeeId { get; set; }
 
-    public int ShiperId { get; set; }
+    public int ShipperId { get; set; }
 
     public DateTime OrderDate { get; init; }
 
@@ -24,7 +24,7 @@ public class Order
 
     public string ShipCity { get; init; } = default!;
 
-    public string ShipRegion { get; init; } = default!;
+    public string? ShipRegion { get; init; }
 
     public string ShipPostalCode { get; init; } = default!;
 
