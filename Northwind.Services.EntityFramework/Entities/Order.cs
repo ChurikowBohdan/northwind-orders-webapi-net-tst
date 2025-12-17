@@ -1,14 +1,17 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Northwind.Services.EntityFramework.Entities;
 
 public class Order
 {
-    public int Id { get; private set; }
+    public int OrderID { get; private set; }
 
-    public string CustomerId { get; set; } = default!;
+    public string CustomerID { get; set; } = default!;
 
-    public int EmployeeId { get; set; }
+    public int EmployeeID { get; set; }
 
-    public int ShipperId { get; set; }
+    [Column("ShipVia")]
+    public int ShipperID { get; set; }
 
     public DateTime OrderDate { get; init; }
 

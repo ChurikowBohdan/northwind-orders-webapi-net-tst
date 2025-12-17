@@ -1,10 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Northwind.Services.EntityFramework.Entities;
 
+[PrimaryKey(nameof(OrderID), nameof(ProductID))]
 public class OrderDetail
 {
-    public int OrderId { get; set; }
+    public int OrderID { get; set; }
 
-    public int ProductId { get; init; }
+    public int ProductID { get; init; }
 
     public double UnitPrice { get; init; }
 

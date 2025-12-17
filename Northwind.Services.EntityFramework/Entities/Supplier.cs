@@ -2,7 +2,7 @@ namespace Northwind.Services.EntityFramework.Entities;
 
 public class Supplier
 {
-    public int Id { get; private set; }
+    public int SupplierID { get; private set; }
 
     public string CompanyName { get; init; } = default!;
 

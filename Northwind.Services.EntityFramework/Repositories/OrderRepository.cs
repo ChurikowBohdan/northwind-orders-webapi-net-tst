@@ -26,20 +26,20 @@ public sealed class OrderRepository : IOrderRepository
             .Include(o => o.OrderDetails)
                 .ThenInclude(od => od.Product)
                     .ThenInclude(p => p.Category)
-            .FirstOrDefaultAsync(o => o.Id == orderId);
+            .FirstOrDefaultAsync(o => o.OrderID == orderId);
 
         if (order == null)
         {
             throw new OrderNotFoundException($"Order with id {orderId} was not found.");
         }
 
-        var result = new RepositoryOrder(order.Id)
+        var result = new RepositoryOrder(order.OrderID)
         {
-            Customer = new Services.Repositories.Customer(new CustomerCode(order.CustomerId))
+            Customer = new Services.Repositories.Customer(new CustomerCode(order.CustomerID))
             {
                 CompanyName = order.Customer.CompanyName,
             },
-            Employee = new Services.Repositories.Employee(order.Employee.Id)
+            Employee = new Services.Repositories.Employee(order.Employee.EmployeeID)
             {
                 FirstName = order.Employee.FirstName,
                 LastName = order.Employee.LastName,
@@ -48,7 +48,7 @@ public sealed class OrderRepository : IOrderRepository
             OrderDate = order.OrderDate,
             RequiredDate = order.RequiredDate,
             ShippedDate = order.ShippedDate,
-            Shipper = new Services.Repositories.Shipper(order.Shipper.Id)
+            Shipper = new Services.Repositories.Shipper(order.Shipper.ShipperID)
             {
                 CompanyName = order.Shipper.CompanyName,
             },
@@ -66,13 +66,13 @@ public sealed class OrderRepository : IOrderRepository
         {
             result.OrderDetails.Add(new Services.Repositories.OrderDetail(result)
             {
-                Product = new Services.Repositories.Product(detail.Product.Id)
+                Product = new Services.Repositories.Product(detail.Product.ProductID)
                 {
                     ProductName = detail.Product.ProductName,
-                    SupplierId = detail.Product.SupplierId,
+                    SupplierId = detail.Product.SupplierID,
                     Supplier = detail.Product.Supplier.CompanyName,
-                    CategoryId = detail.Product.CategoryId,
-                    Category = detail.Product.Category.Name,
+                    CategoryId = detail.Product.CategoryID,
+                    Category = detail.Product.Category.CategoryName,
                 },
                 UnitPrice = detail.UnitPrice,
                 Quantity = detail.Quantity,
@@ -85,22 +85,16 @@ public sealed class OrderRepository : IOrderRepository
 
     public async Task<IList<RepositoryOrder>> GetOrdersAsync(int skip, int count)
     {
-        if (skip < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(skip));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(skip);
 
-        if (count <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
 
         var orders = await _context.Orders
             .AsNoTracking()
             .Include(o => o.Customer)
             .Include(o => o.Employee)
             .Include(o => o.Shipper)
-            .OrderBy(o => o.Id)
+            .OrderBy(o => o.OrderID)
             .Skip(skip)
             .Take(count)
             .ToListAsync();
@@ -109,13 +103,13 @@ public sealed class OrderRepository : IOrderRepository
 
         foreach (var order in orders)
         {
-            var repositoryOrder = new RepositoryOrder(order.Id)
+            var repositoryOrder = new RepositoryOrder(order.OrderID)
             {
-                Customer = new Services.Repositories.Customer(new CustomerCode(order.CustomerId))
+                Customer = new Services.Repositories.Customer(new CustomerCode(order.CustomerID))
                 {
                     CompanyName = order.Customer.CompanyName,
                 },
-                Employee = new Services.Repositories.Employee(order.Employee.Id)
+                Employee = new Services.Repositories.Employee(order.Employee.EmployeeID)
                 {
                     FirstName = order.Employee.FirstName,
                     LastName = order.Employee.LastName,
@@ -124,7 +118,7 @@ public sealed class OrderRepository : IOrderRepository
                 OrderDate = order.OrderDate,
                 RequiredDate = order.RequiredDate,
                 ShippedDate = order.ShippedDate,
-                Shipper = new Services.Repositories.Shipper(order.Shipper.Id)
+                Shipper = new Services.Repositories.Shipper(order.Shipper.ShipperID)
                 {
                     CompanyName = order.Shipper.CompanyName,
                 },
@@ -135,7 +129,7 @@ public sealed class OrderRepository : IOrderRepository
                     order.ShipCity,
                     order.ShipRegion,
                     order.ShipPostalCode,
-                    order.ShipCountry)
+                    order.ShipCountry),
             };
 
             result.Add(repositoryOrder);

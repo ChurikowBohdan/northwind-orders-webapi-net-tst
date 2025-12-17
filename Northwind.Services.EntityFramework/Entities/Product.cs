@@ -2,11 +2,11 @@ namespace Northwind.Services.EntityFramework.Entities;
 
 public class Product
 {
-    public int Id { get; private init; }
+    public int ProductID { get; private init; }
 
-    public int SupplierId { get; init; }
+    public int SupplierID { get; init; }
 
-    public int CategoryId { get; init; }
+    public int CategoryID { get; init; }
 
     public string ProductName { get; init; } = default!;
 
