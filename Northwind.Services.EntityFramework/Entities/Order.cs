@@ -13,25 +13,25 @@ public class Order
     [Column("ShipVia")]
     public int ShipperID { get; set; }
 
-    public DateTime OrderDate { get; init; }
+    public DateTime OrderDate { get; set; }
 
-    public DateTime RequiredDate { get; init; }
+    public DateTime RequiredDate { get; set; }
 
-    public DateTime? ShippedDate { get; init; }
+    public DateTime? ShippedDate { get; set; }
 
-    public double Freight { get; init; }
+    public double Freight { get; set; }
 
-    public string ShipName { get; init; } = default!;
+    public string ShipName { get; set; } = default!;
 
-    public string ShipAddress { get; init; } = default!;
+    public string ShipAddress { get; set; } = default!;
 
-    public string ShipCity { get; init; } = default!;
+    public string ShipCity { get; set; } = default!;
 
-    public string? ShipRegion { get; init; }
+    public string? ShipRegion { get; set; }
 
-    public string ShipPostalCode { get; init; } = default!;
+    public string ShipPostalCode { get; set; } = default!;
 
-    public string ShipCountry { get; init; } = default!;
+    public string ShipCountry { get; set; } = default!;
 
     public Customer Customer { get; set; } = null!;
 

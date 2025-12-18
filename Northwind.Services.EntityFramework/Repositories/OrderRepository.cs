@@ -138,18 +138,105 @@ public sealed class OrderRepository : IOrderRepository
         return result;
     }
 
-    public Task<long> AddOrderAsync(RepositoryOrder order)
+    public async Task<long> AddOrderAsync(RepositoryOrder order)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var entity = new Entities.Order
+            {
+                CustomerID = order.Customer.Code.Code,
+                EmployeeID = (int)order.Employee.Id,
+                ShipperID = (int)order.Shipper.Id,
+                OrderDate = order.OrderDate,
+                RequiredDate = order.RequiredDate,
+                ShippedDate = order.ShippedDate,
+                Freight = order.Freight,
+                ShipName = order.ShipName,
+                ShipAddress = order.ShippingAddress.Address,
+                ShipCity = order.ShippingAddress.City,
+                ShipRegion = order.ShippingAddress.Region,
+                ShipPostalCode = order.ShippingAddress.PostalCode,
+                ShipCountry = order.ShippingAddress.Country,
+            };
+
+            foreach (var detail in order.OrderDetails)
+            {
+                entity.OrderDetails.Add(new Entities.OrderDetail
+                {
+                    ProductID = (int)detail.Product.Id,
+                    UnitPrice = detail.UnitPrice,
+                    Quantity = detail.Quantity,
+                    Discount = detail.Discount,
+                });
+            }
+
+            _context.Orders.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return entity.OrderID;
+        }
+        catch (Exception ex)
+        {
+            throw new RepositoryException("Failed to add order.", ex);
+        }
     }
 
-    public Task RemoveOrderAsync(long orderId)
+    public async Task RemoveOrderAsync(long orderId)
     {
-        throw new NotImplementedException();
+        var order = await _context.Orders
+        .Include(o => o.OrderDetails)
+        .FirstOrDefaultAsync(o => o.OrderID == orderId);
+
+        if (order == null)
+        {
+            throw new OrderNotFoundException($"Order with id {orderId} was not found.");
+        }
+
+        _context.OrderDetails.RemoveRange(order.OrderDetails);
+        _context.Orders.Remove(order);
+
+        await _context.SaveChangesAsync();
     }
 
-    public Task UpdateOrderAsync(RepositoryOrder order)
+    public async Task UpdateOrderAsync(RepositoryOrder order)
     {
-        throw new NotImplementedException();
+        var entity = await _context.Orders
+        .Include(o => o.OrderDetails)
+        .FirstOrDefaultAsync(o => o.OrderID == order.Id);
+
+        if (entity == null)
+        {
+            throw new OrderNotFoundException($"Order with id {order.Id} was not found.");
+        }
+
+        entity.CustomerID = order.Customer.Code.Code;
+        entity.EmployeeID = (int)order.Employee.Id;
+        entity.ShipperID = (int)order.Shipper.Id;
+        entity.OrderDate = order.OrderDate;
+        entity.RequiredDate = order.RequiredDate;
+        entity.ShippedDate = order.ShippedDate;
+        entity.Freight = order.Freight;
+        entity.ShipName = order.ShipName;
+        entity.ShipAddress = order.ShippingAddress.Address;
+        entity.ShipCity = order.ShippingAddress.City;
+        entity.ShipRegion = order.ShippingAddress.Region;
+        entity.ShipPostalCode = order.ShippingAddress.PostalCode;
+        entity.ShipCountry = order.ShippingAddress.Country;
+
+        _context.OrderDetails.RemoveRange(entity.OrderDetails);
+
+        foreach (var detail in order.OrderDetails)
+        {
+            entity.OrderDetails.Add(new Entities.OrderDetail
+            {
+                OrderID = entity.OrderID,
+                ProductID = (int)detail.Product.Id,
+                UnitPrice = detail.UnitPrice,
+                Quantity = detail.Quantity,
+                Discount = detail.Discount,
+            });
+        }
+
+        await _context.SaveChangesAsync();
     }
 }
