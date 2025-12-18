@@ -246,4 +246,3 @@ public sealed class OrdersController : ControllerBase
         return result;
     }
 }
-
